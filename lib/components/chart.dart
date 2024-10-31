@@ -22,7 +22,7 @@ class Chart extends StatelessWidget {
         bool sameYear = recentTransacao[i].date.year == weekDay.year;
 
         if (sameDay && sameMonth && sameYear) {
-          totalSum += recentTransacao[1].value;
+          totalSum += recentTransacao[i].value;
         }
       }
 
@@ -30,7 +30,7 @@ class Chart extends StatelessWidget {
     }).reversed.toList();
   }
 
-  double get _weekTotalVaue {
+  double get _weekTotalValue {
     return groupedTransacoes.fold(0.0, (sum, tr) {
       return sum + tr['value'];
     });
@@ -51,9 +51,9 @@ class Chart extends StatelessWidget {
               child: ChartBar(
                 label: tr['day'],
                 value: tr['value'],
-                percentage: (tr['value']) / _weekTotalVaue,
+                percentage: _weekTotalValue == 0 ? 0 : (tr['value'] / _weekTotalValue),
               ),
-            );
+            ); 
           }).toList(),
         ),
       ),

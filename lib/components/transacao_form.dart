@@ -1,32 +1,47 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
-class TransacaoForm extends StatelessWidget {
-  final tituloController = TextEditingController();
-  final valorController = TextEditingController();
-
-  final void Function(String, double) onSubmit;
+class TransacaoForm extends StatefulWidget {
+  final void Function(String, double, DateTime) onSubmit;
 
   TransacaoForm(this.onSubmit);
 
+  @override
+  State<TransacaoForm> createState() => _TransacaoFormState();
+}
+
+class _TransacaoFormState extends State<TransacaoForm> {
+  final _tituloController = TextEditingController();
+  final _valorController = TextEditingController();
+
+  DateTime _selectedDate = DateTime.now();
+
   _subimitForm() {
-    final titulo = tituloController.text;
-    final valor = double.tryParse(valorController.text) ?? 0.0;
+    final titulo = _tituloController.text;
+    final valor = double.tryParse(_valorController.text) ?? 0.0;
 
     if (titulo.isEmpty || valor <= 0) {
       return;
     }
 
-    onSubmit(titulo, valor);
+    widget.onSubmit(titulo, valor, _selectedDate);
   }
 
-  _showDatePicker() {
+  _showDatePicker(BuildContext context) {
     showDatePicker(
-        context: context,//erro
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2022),
-        lastDate: DateTime.now(),
-        // locale: const Locale('pt', 'BR'),
-        );
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2023),
+      lastDate: DateTime.now(),
+      // locale: const Locale('pt', 'BR'),
+    ).then((PickedDate) {
+      if (PickedDate == null) {
+        return;
+      }
+      setState(() {
+        _selectedDate = PickedDate;
+      });
+    });
   }
 
   @override
@@ -39,14 +54,14 @@ class TransacaoForm extends StatelessWidget {
           child: Column(
             children: <Widget>[
               TextField(
-                controller: tituloController,
+                controller: _tituloController,
                 onSubmitted: (_) => _subimitForm(),
                 decoration: InputDecoration(
                   labelText: 'Título',
                 ),
               ),
               TextField(
-                controller: valorController,
+                controller: _valorController,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 onSubmitted: (_) => _subimitForm(),
                 decoration: InputDecoration(
@@ -57,12 +72,16 @@ class TransacaoForm extends StatelessWidget {
                 height: 70,
                 child: Row(
                   children: [
-                    Text('Nenhuma data selecionada.'),
+                    Expanded(
+                      child: Text(_selectedDate == null
+                          ? 'Nenhuma data selecionada.'
+                          : DateFormat('dd/MM/y').format(_selectedDate)),
+                    ),
                     TextButton(
                       style: TextButton.styleFrom(
                           foregroundColor: Colors.purple.shade400),
                       child: Text('Selecionar Data'),
-                      onPressed:  _showDatePicker,
+                      onPressed: () => _showDatePicker(context),
                     )
                   ],
                 ),

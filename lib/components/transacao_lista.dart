@@ -4,8 +4,9 @@ import 'package:intl/intl.dart';
 
 class TransacaoLista extends StatelessWidget {
   final List<Transacao> transacoes;
+  final void Function(String) onRemove;
 
-  TransacaoLista(this.transacoes);
+  TransacaoLista(this.transacoes, this.onRemove);
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +40,17 @@ class TransacaoLista extends StatelessWidget {
                       radius: 30,
                       child: Padding(
                         padding: const EdgeInsets.all(9),
-                        child: FittedBox(
-                          child: Text('R\$${tr.value}')),
+                        child: FittedBox(child: Text('R\$${tr.value}')),
                       ),
                     ),
                     title: Text(tr.title),
                     subtitle: Text(DateFormat('d MMM y').format(tr.date)),
+                    trailing: IconButton(
+                        onPressed: () => onRemove(tr.id),
+                        icon: Icon(
+                          Icons.delete,
+                          color: Colors.red.shade600,
+                        )),
                   ),
                 );
               }),
