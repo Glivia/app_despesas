@@ -5,11 +5,13 @@ class Transacao {
   final String title;
   final double value;
   final DateTime date;
+  final bool entrada;
 
   Transacao({
     required this.id,
     required this.title,
     required this.value,
     required this.date,
+    required this.entrada,
   });
 }

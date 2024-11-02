@@ -15,15 +15,7 @@ class TransacaoLista extends StatelessWidget {
       child: transacoes.isEmpty
           ? Column(
               children: <Widget>[
-                SizedBox(height: 70),
-                Container(
-                  height: 150,
-                  child: Image.asset(
-                    'build/assets/images/search-folder.png',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(height: 5),
+                SizedBox(height: 100),
                 Text('Nenhuma Gasto Cadastrado!'),
               ],
             )
@@ -36,7 +28,7 @@ class TransacaoLista extends StatelessWidget {
                   margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.purple.shade500,
+                      backgroundColor:  tr.entrada ? Color.fromARGB(255, 144, 255, 23) : Colors.red,
                       radius: 30,
                       child: Padding(
                         padding: const EdgeInsets.all(9),

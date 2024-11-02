@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 class TransacaoForm extends StatefulWidget {
-  final void Function(String, double, DateTime) onSubmit;
+  final void Function(String, double, DateTime, bool) onSubmit;
 
   TransacaoForm(this.onSubmit);
 
@@ -13,6 +13,7 @@ class TransacaoForm extends StatefulWidget {
 class _TransacaoFormState extends State<TransacaoForm> {
   final _tituloController = TextEditingController();
   final _valorController = TextEditingController();
+  bool _entrada = true;
 
   DateTime _selectedDate = DateTime.now();
 
@@ -24,7 +25,7 @@ class _TransacaoFormState extends State<TransacaoForm> {
       return;
     }
 
-    widget.onSubmit(titulo, valor, _selectedDate);
+    widget.onSubmit(titulo, valor, _selectedDate, _entrada);
   }
 
   _showDatePicker(BuildContext context) {
@@ -72,6 +73,19 @@ class _TransacaoFormState extends State<TransacaoForm> {
                 height: 70,
                 child: Row(
                   children: [
+                     Row(
+                children: [
+                  Text('Entrada?'), // Rótulo para o checkbox
+                  Checkbox(
+                    value: _entrada,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _entrada = value ?? false; // Atualiza o estado do checkbox
+                      });
+                    },
+                  ),
+                ],
+              ),
                     Expanded(
                       child: Text(_selectedDate == null
                           ? 'Nenhuma data selecionada.'
@@ -79,7 +93,8 @@ class _TransacaoFormState extends State<TransacaoForm> {
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
-                          foregroundColor: Colors.purple.shade400),
+                        foregroundColor: Color.fromARGB(255, 144, 255, 23),
+                      ),
                       child: Text('Selecionar Data'),
                       onPressed: () => _showDatePicker(context),
                     )
@@ -93,7 +108,7 @@ class _TransacaoFormState extends State<TransacaoForm> {
                     style: TextButton.styleFrom(
                         foregroundColor:
                             const Color.fromARGB(255, 253, 243, 255),
-                        backgroundColor: Colors.purple.shade400),
+                        backgroundColor: Color.fromARGB(255, 144, 255, 23)),
                     child: Text('Nova Transação'),
                     onPressed: _subimitForm,
                   ),
