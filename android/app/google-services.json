@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "748611206495",
+    "project_id": "app-despesas-flutter",
+    "storage_bucket": "app-despesas-flutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:748611206495:android:3ef4d08055b4171d198aea",
+        "android_client_info": {
+          "package_name": "com.glivia.appdespesas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGxyqqJEBe925kgl8GbFMduO4lUU06YLk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

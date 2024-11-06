@@ -2,11 +2,15 @@ import 'package:app_despesas/transacao.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+
+
 class TransacaoLista extends StatelessWidget {
   final List<Transacao> transacoes;
   final void Function(String) onRemove;
+  final void Function( String id, String title, double value, DateTime date, bool entrada) onEdit;
+   final void Function(BuildContext context, {Transacao? transacao}) onOpenForm;
 
-  TransacaoLista(this.transacoes, this.onRemove);
+  TransacaoLista(this.transacoes, this.onRemove, this.onEdit, this.onOpenForm);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +20,7 @@ class TransacaoLista extends StatelessWidget {
           ? Column(
               children: <Widget>[
                 SizedBox(height: 100),
-                Text('Nenhuma Gasto Cadastrado!'),
+                Text('Nenhum Gasto Cadastrado!'),
               ],
             )
           : ListView.builder(
@@ -28,7 +32,9 @@ class TransacaoLista extends StatelessWidget {
                   margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor:  tr.entrada ? Color.fromARGB(255, 144, 255, 23) : Colors.red,
+                      backgroundColor: tr.entrada
+                          ? Color.fromARGB(255, 144, 255, 23)
+                          : Colors.red,
                       radius: 30,
                       child: Padding(
                         padding: const EdgeInsets.all(9),
@@ -37,12 +43,24 @@ class TransacaoLista extends StatelessWidget {
                     ),
                     title: Text(tr.title),
                     subtitle: Text(DateFormat('d MMM y').format(tr.date)),
-                    trailing: IconButton(
-                        onPressed: () => onRemove(tr.id),
-                        icon: Icon(
-                          Icons.delete,
-                          color: Colors.red.shade600,
-                        )),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min, 
+                      children: [
+                        IconButton(
+                          onPressed: () => onOpenForm(context, transacao: tr),
+                          icon: Icon(
+                            Icons.edit,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        IconButton(
+                            onPressed: () => onRemove(tr.id),
+                            icon: Icon(
+                              Icons.delete,
+                              color: Colors.red.shade600,
+                            )),
+                      ],
+                    ),
                   ),
                 );
               }),
