@@ -1,14 +1,14 @@
 import 'package:app_despesas/transacao.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-
+import 'package:app_despesas/main.dart';
+import 'package:supabase/supabase.dart';
 
 class TransacaoLista extends StatelessWidget {
   final List<Transacao> transacoes;
   final void Function(String) onRemove;
   final void Function( String id, String title, double value, DateTime date, bool entrada) onEdit;
-   final void Function(BuildContext context, {Transacao? transacao}) onOpenForm;
+  final void Function(BuildContext context, {Transacao? transacao}) onOpenForm;
 
   TransacaoLista(this.transacoes, this.onRemove, this.onEdit, this.onOpenForm);
 
@@ -42,9 +42,9 @@ class TransacaoLista extends StatelessWidget {
                       ),
                     ),
                     title: Text(tr.title),
-                    subtitle: Text(DateFormat('d MMM y').format(tr.date)),
+                    subtitle: Text(DateFormat('d MMM y').format(tr.data)),
                     trailing: Row(
-                      mainAxisSize: MainAxisSize.min, 
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
                           onPressed: () => onOpenForm(context, transacao: tr),
@@ -54,7 +54,9 @@ class TransacaoLista extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                            onPressed: () => onRemove(tr.id),
+                            onPressed: () {
+                            onRemove(tr.id); 
+                          },
                             icon: Icon(
                               Icons.delete,
                               color: Colors.red.shade600,

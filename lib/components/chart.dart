@@ -17,16 +17,19 @@ class Chart extends StatelessWidget {
       double totalSum = 0.0;
 
       for (var i = 0; i < recentTransacao.length; i++) {
-        bool sameDay = recentTransacao[i].date.day == weekDay.day;
-        bool sameMonth = recentTransacao[i].date.month == weekDay.month;
-        bool sameYear = recentTransacao[i].date.year == weekDay.year;
+        bool sameDay = recentTransacao[i].data.day == weekDay.day;
+        bool sameMonth = recentTransacao[i].data.month == weekDay.month;
+        bool sameYear = recentTransacao[i].data.year == weekDay.year;
 
         if (sameDay && sameMonth && sameYear) {
-          totalSum += recentTransacao[i].value;
+          totalSum += recentTransacao[i].entrada ? recentTransacao[i].value : -recentTransacao[i].value;
         }
       }
 
-      return {'day': DateFormat.E('pt_BR').format(weekDay).substring(0, 3), 'value': totalSum};
+      return {
+        'day': DateFormat.E('pt_BR').format(weekDay).substring(0, 3), 
+        'value': totalSum
+      };
     }).reversed.toList();
   }
 

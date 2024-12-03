@@ -1,6 +1,8 @@
 import 'package:app_despesas/transacao.dart';
 import 'package:intl/intl.dart';
+import 'package:app_despesas/database/supabase.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class TransacaoForm extends StatefulWidget {
@@ -8,17 +10,17 @@ class TransacaoForm extends StatefulWidget {
   final Transacao? transacao;
   final void Function(String, String, double, DateTime, bool)? onEdit;
 
-  TransacaoForm(this.onSubmit, {this.transacao, this.onEdit});
+  TransacaoForm(this.onSubmit, {this.transacao, required this.onEdit});
 
   @override
-  State<TransacaoForm> createState() => _TransacaoFormState();
+  _TransacaoFormState createState() => _TransacaoFormState();
 }
 
 class _TransacaoFormState extends State<TransacaoForm> {
   final _tituloController = TextEditingController();
   final _valorController = TextEditingController();
   bool _entrada = true;
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedData = DateTime.now();
 
   @override
   void initState() {
@@ -26,33 +28,30 @@ class _TransacaoFormState extends State<TransacaoForm> {
     if (widget.transacao != null) {
       _tituloController.text = widget.transacao!.title;
       _valorController.text = widget.transacao!.value.toString();
-      _selectedDate = widget.transacao!.date;
+      _selectedData = widget.transacao!.data;
       _entrada = widget.transacao!.entrada;
     }
   }
 
-  _subimitForm() {
+  void _submitForm() {
     final titulo = _tituloController.text;
     final valor = double.tryParse(_valorController.text) ?? 0.0;
 
     if (titulo.isEmpty || valor <= 0) {
       return;
-    } if (widget.transacao == null) {
- 
-    widget.onSubmit(titulo, valor, _selectedDate, _entrada);
-  } else {
-    // Se houver uma transação existente, edita-a
-    widget.onEdit?.call(
-      widget.transacao!.id, // ID da transação a ser editada
-      titulo, 
-      valor, 
-      _selectedDate, 
-      _entrada
-    );
-     Navigator.of(context).pop();
-  }
- 
- 
+    }
+    if (widget.transacao == null) {
+      widget.onSubmit(titulo, valor, _selectedData, _entrada);
+    } else {
+      widget.onEdit?.call(
+        widget.transacao!.id,
+        titulo,
+        valor,
+        _selectedData,
+        _entrada,
+      );
+      Navigator.of(context).pop();
+    }
   }
 
   _showDatePicker(BuildContext context) {
@@ -67,7 +66,7 @@ class _TransacaoFormState extends State<TransacaoForm> {
         return;
       }
       setState(() {
-        _selectedDate = PickedDate;
+        _selectedData = PickedDate;
       });
     });
   }
@@ -83,7 +82,7 @@ class _TransacaoFormState extends State<TransacaoForm> {
             children: <Widget>[
               TextField(
                 controller: _tituloController,
-                onSubmitted: (_) => _subimitForm(),
+                onSubmitted: (_) => _submitForm(),
                 decoration: InputDecoration(
                   labelText: 'Título',
                 ),
@@ -91,7 +90,7 @@ class _TransacaoFormState extends State<TransacaoForm> {
               TextField(
                 controller: _valorController,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onSubmitted: (_) => _subimitForm(),
+                onSubmitted: (_) => _submitForm(),
                 decoration: InputDecoration(
                   labelText: 'Valor (R\$)',
                 ),
@@ -102,21 +101,18 @@ class _TransacaoFormState extends State<TransacaoForm> {
                   children: [
                     Row(
                       children: [
-                        Text('Entrada?'), // Rótulo para o checkbox
+                        Text('Entrada?'), 
                         Checkbox(
                           value: _entrada,
                           onChanged: (bool? value) {
                             setState(() {
                               _entrada = value ??
-                                  false; // Atualiza o estado do checkbox
+                                  false; 
                             });
                           },
                         ),
                       ],
                     ),
-                    // Expanded(
-                    //   child: Text(_selectedDate == null ? 'Nenhuma data selecionada' : DateFormat('dd/MM/y').format(_selectedDate)),
-                    // ),
                     TextButton(
                       style: TextButton.styleFrom(
                         foregroundColor: Color.fromARGB(255, 144, 255, 23),
@@ -135,8 +131,10 @@ class _TransacaoFormState extends State<TransacaoForm> {
                         foregroundColor:
                             const Color.fromARGB(255, 253, 243, 255),
                         backgroundColor: Color.fromARGB(255, 144, 255, 23)),
-                    child: Text('Nova Transação'),
-                    onPressed: _subimitForm,
+                    child: Text(widget.transacao == null
+                        ? 'Nova Transação'
+                        : 'Editar Transação'),
+                    onPressed: _submitForm,
                   ),
                 ],
               )
@@ -147,3 +145,4 @@ class _TransacaoFormState extends State<TransacaoForm> {
     );
   }
 }
+
