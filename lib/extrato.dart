@@ -75,33 +75,26 @@ class _Extrato extends State<Extrato> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
+        automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(
           'Extrato',
           style: TextStyle(
             color: Colors.white,
+            fontSize: 20, 
+            fontWeight: FontWeight.bold, 
           ),
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+      centerTitle: true, 
       ),
       body: Column(
         children: [
-          // Painel de entradas e saídas
           Container(
             color: Colors.grey[200],
             padding: EdgeInsets.all(16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                // Entradas com seta
                 Column(
                   children: [
                     Row(
@@ -174,19 +167,17 @@ class _Extrato extends State<Extrato> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Cabeçalho com a data
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         data,
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.black,
                         ),
                       ),
                     ),
-                    // Lista de transações
                     ...transacoes.map((tr) {
                       Color transacaoColor = tr.entrada ? Colors.green : Colors.red;
                       return Card(
@@ -195,8 +186,8 @@ class _Extrato extends State<Extrato> {
                           leading: CircleAvatar(
                             backgroundColor: transacaoColor,
                             child: Icon(
-                              tr.entrada ? Icons.arrow_downward : Icons.arrow_upward,
-                              color: Colors.white,
+                            tr.entrada ? Icons.arrow_downward : Icons.arrow_upward,
+                             color: Colors.white,
                             ),
                           ),
                           title: Text(
@@ -220,46 +211,49 @@ class _Extrato extends State<Extrato> {
           ),
         ],
       ),
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          indicatorColor: Colors.transparent,
-          iconTheme: WidgetStateProperty.all(
-            IconThemeData(color: const Color.fromARGB(255, 125, 125, 125)),
-          ),
-          labelTextStyle: WidgetStateProperty.all(
-            TextStyle(color: const Color.fromARGB(255, 125, 125, 125)),
-          ),
-        ),
-        child: NavigationBar(
-          selectedIndex: 1,
-          onDestinationSelected: (int index) {
-            if (index == 0) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => MyHomePage()),
-                (route) => false,
-              );
-            } else if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Extrato()),
-              );
-            }
-          },
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'Transações',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.attach_money_outlined),
-              selectedIcon: Icon(Icons.attach_money),
-              label: 'Extrato',
-            ),
-          ],
-        ),
+       bottomNavigationBar: Container(
+     margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+    child: NavigationBarTheme(
+    data: NavigationBarThemeData(
+      indicatorColor: Colors.transparent,
+      iconTheme: WidgetStateProperty.all(
+        IconThemeData(color: Colors.grey),
       ),
+      labelTextStyle: WidgetStateProperty.all(
+        TextStyle(color: Colors.grey), 
+      ),
+    ),
+    child: NavigationBar(
+      selectedIndex: 0,
+      onDestinationSelected: (int index) {
+        if (index == 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => MyHomePage()),
+            (route) => false, 
+          );
+        } else if (index == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Extrato()),
+          );
+        }
+      },
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.autorenew_rounded),
+          label: 'Transações',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.attach_money_outlined),
+          selectedIcon: Icon(Icons.attach_money),
+          label: 'Extrato',
+        ),
+      ],
+    ),
+    ),
+  ),
     );
   }
 }

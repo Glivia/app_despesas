@@ -189,6 +189,7 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.white,
           ),
         ),
+        centerTitle: true, 
       ),
   bottomNavigationBar: Container(
      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
@@ -221,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
       destinations: const [
         NavigationDestination(
           icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home),
+          selectedIcon: Icon(Icons.autorenew_rounded),
           label: 'Transações',
         ),
         NavigationDestination(
