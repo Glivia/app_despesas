@@ -12,7 +12,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'extrato.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
     url: 'https://vpknkuadfqjdmkcqafxz.supabase.co',
