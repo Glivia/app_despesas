@@ -9,8 +9,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'transacao.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'extrato.dart';
 
-main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
@@ -36,7 +37,7 @@ class AppDespesas extends StatelessWidget {
       home: MyHomePage(),
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: Color.fromARGB(255, 255, 255, 255),
+        scaffoldBackgroundColor: Color.fromARGB(255, 237, 237, 237),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromARGB(255, 144, 255, 23),
           primary: const Color.fromARGB(255, 0, 193, 108),
@@ -58,7 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   double _totalValue = 0.0;
 
-  // CHAMADA DO CHART
   List<Transacao> get _recentTransacoes {
     return _Transacoes.where((tr) {
       return tr.data.isAfter(DateTime.now().subtract(
@@ -67,7 +67,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
-  @override
   void initState() {
     super.initState();
     _carregarTransacoes();
@@ -79,12 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
       List<Transacao> transacoesList = transacoes.map((tr) {
         return Transacao(
-          id: tr[
-              'id'], // Garantir que o campo do Map corresponde ao nome da variável no objeto Transacao
+          id: tr['id'], 
           title: tr['titulo'],
           value: tr['valor'],
           data: DateTime.parse(
-              tr['data']), // Converter a string para DateTime, se necessário
+              tr['data']), 
           entrada: tr['entrada'],
         );
       }).toList();
@@ -92,15 +90,13 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _Transacoes.clear();
         _Transacoes.addAll(transacoesList);
-        _totalValue = _Transacoes.fold(
-            0.0, (sum, tr) => sum + (tr.entrada ? tr.value : -tr.value));
+        _totalValue = _Transacoes.fold(0.0, (sum, tr) => sum + (tr.entrada ? tr.value : -tr.value));
       });
     } catch (e) {
       print('Erro ao carregar transações: $e');
     }
   }
 
-  // ADICIONA TRANSACAO
   _AddTransacao(
       String titulo, double valor, DateTime data, bool entrada) async {
     final newTransacao = Transacao(
@@ -114,7 +110,6 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       await Database().addTransacao(titulo, valor, data, entrada);
       await _carregarTransacoes();
-      // ATRIBUIÇÃO DA NOVA TRANSACAO NO CHART
     } catch (error) {
       print('erro: $error');
     }
@@ -125,7 +120,6 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.of(context).pop();
   }
 
-  // EXCLUIR
   _deleteTransacao(String id) async {
     try {
       await Database().deleteTransacao(id);
@@ -146,7 +140,6 @@ class _MyHomePageState extends State<MyHomePage> {
       });
   }
 
-  // EDITAR
   _editTransacao(String id, String newTitle, double newValue, DateTime newDate,
       bool newEntrada) async {
     final transacaoIndex = _Transacoes.indexWhere((tr) => tr.id == id);
@@ -160,10 +153,8 @@ class _MyHomePageState extends State<MyHomePage> {
        setState(() {
           final oldTransacao = _Transacoes[transacaoIndex];
 
-          _totalValue -=
-              oldTransacao.entrada ? oldTransacao.value : -oldTransacao.value;
-          _totalValue +=
-              newEntrada ? newValue : -newValue; 
+          _totalValue -= oldTransacao.entrada ? oldTransacao.value : -oldTransacao.value;
+          _totalValue += newEntrada ? newValue : -newValue; 
 
           _Transacoes[transacaoIndex] = Transacao(
             id: id,
@@ -185,7 +176,6 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -200,39 +190,49 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.all(0),
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Transações'),
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.attach_money_rounded),
-              title: Text('Extrato'),
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
+  bottomNavigationBar: Container(
+     margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+    child: NavigationBarTheme(
+    data: NavigationBarThemeData(
+      indicatorColor: Colors.transparent,
+      iconTheme: WidgetStateProperty.all(
+        IconThemeData(color: Colors.grey),
       ),
+      labelTextStyle: WidgetStateProperty.all(
+        TextStyle(color: Colors.grey), 
+      ),
+    ),
+    child: NavigationBar(
+      selectedIndex: 0,
+      onDestinationSelected: (int index) {
+        if (index == 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => MyHomePage()),
+            (route) => false, 
+          );
+        } else if (index == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Extrato()),
+          );
+        }
+      },
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home),
+          label: 'Transações',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.attach_money_outlined),
+          selectedIcon: Icon(Icons.attach_money),
+          label: 'Extrato',
+        ),
+      ],
+    ),
+    ),
+  ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -243,14 +243,13 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text(
                 'R\$${_totalValue.toStringAsFixed(2)}',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: _totalValue >= 0 ? Colors.green : Colors.red,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: _totalValue >= 0 ? Colors.green : Colors.red,
                 ),
               ),
             ),
-            TransacaoLista(_Transacoes, _deleteTransacao, _editTransacao,
-                _openTransacaoFormModal),
+            TransacaoLista(_Transacoes, _deleteTransacao, _editTransacao, _openTransacaoFormModal),
           ],
         ),
       ),
@@ -263,6 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Theme.of(context).colorScheme.primary,
           shape: CircleBorder(),
           onPressed: () => _openTransacaoFormModal(context)),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

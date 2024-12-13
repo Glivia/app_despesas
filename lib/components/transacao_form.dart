@@ -43,13 +43,8 @@ class _TransacaoFormState extends State<TransacaoForm> {
     if (widget.transacao == null) {
       widget.onSubmit(titulo, valor, _selectedData, _entrada);
     } else {
-      widget.onEdit?.call(
-        widget.transacao!.id,
-        titulo,
-        valor,
-        _selectedData,
-        _entrada,
-      );
+      widget.onEdit
+          ?.call(widget.transacao!.id, titulo, valor, _selectedData, _entrada);
       Navigator.of(context).pop();
     }
   }
@@ -60,7 +55,6 @@ class _TransacaoFormState extends State<TransacaoForm> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2023),
       lastDate: DateTime.now(),
-      // locale: const Locale('pt', 'BR'),
     ).then((PickedDate) {
       if (PickedDate == null) {
         return;
@@ -101,13 +95,12 @@ class _TransacaoFormState extends State<TransacaoForm> {
                   children: [
                     Row(
                       children: [
-                        Text('Entrada?'), 
+                        Text('Entrada?'),
                         Checkbox(
                           value: _entrada,
                           onChanged: (bool? value) {
                             setState(() {
-                              _entrada = value ??
-                                  false; 
+                              _entrada = value ?? false;
                             });
                           },
                         ),
@@ -115,8 +108,7 @@ class _TransacaoFormState extends State<TransacaoForm> {
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: Color.fromARGB(255, 144, 255, 23),
-                      ),
+                        foregroundColor: Color.fromARGB(255, 144, 255, 23),),
                       child: Text('Selecionar Data'),
                       onPressed: () => _showDatePicker(context),
                     )
@@ -128,12 +120,9 @@ class _TransacaoFormState extends State<TransacaoForm> {
                 children: <Widget>[
                   TextButton(
                     style: TextButton.styleFrom(
-                        foregroundColor:
-                            const Color.fromARGB(255, 253, 243, 255),
+                        foregroundColor: const Color.fromARGB(255, 253, 243, 255),
                         backgroundColor: Color.fromARGB(255, 144, 255, 23)),
-                    child: Text(widget.transacao == null
-                        ? 'Nova Transação'
-                        : 'Editar Transação'),
+                    child: Text(widget.transacao == null ? 'Nova Transação' : 'Editar Transação'),
                     onPressed: _submitForm,
                   ),
                 ],
@@ -145,4 +134,3 @@ class _TransacaoFormState extends State<TransacaoForm> {
     );
   }
 }
-
