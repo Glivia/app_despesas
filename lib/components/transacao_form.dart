@@ -108,7 +108,7 @@ class _TransacaoFormState extends State<TransacaoForm> {
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: Color.fromARGB(255, 144, 255, 23),),
+                        foregroundColor: const Color.fromARGB(255, 0, 193, 108)),
                       child: Text('Selecionar Data'),
                       onPressed: () => _showDatePicker(context),
                     )
@@ -121,7 +121,7 @@ class _TransacaoFormState extends State<TransacaoForm> {
                   TextButton(
                     style: TextButton.styleFrom(
                         foregroundColor: const Color.fromARGB(255, 253, 243, 255),
-                        backgroundColor: Color.fromARGB(255, 144, 255, 23)),
+                        backgroundColor:const Color.fromARGB(255, 0, 193, 108)),
                     child: Text(widget.transacao == null ? 'Nova Transação' : 'Editar Transação'),
                     onPressed: _submitForm,
                   ),
