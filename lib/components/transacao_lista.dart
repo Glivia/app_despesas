@@ -16,14 +16,12 @@ class TransacaoLista extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 350,
-      child: transacoes.isEmpty
-          ? Column(
+      child: transacoes.isEmpty ? Column(
               children: <Widget>[
                 SizedBox(height: 100),
                 Text('Nenhum Gasto Cadastrado!'),
               ],
-            )
-          : ListView.builder(
+            ) : ListView.builder(
               itemCount: transacoes.length,
               itemBuilder: (ctx, index) {
                 final tr = transacoes[index];
@@ -32,9 +30,7 @@ class TransacaoLista extends StatelessWidget {
                   margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: tr.entrada
-                          ? Color.fromARGB(255, 144, 255, 23)
-                          : Colors.red,
+                      backgroundColor: tr.entrada ? Color.fromARGB(255, 144, 255, 23) : Colors.red,
                       radius: 30,
                       child: Padding(
                         padding: const EdgeInsets.all(9),
@@ -48,19 +44,10 @@ class TransacaoLista extends StatelessWidget {
                       children: [
                         IconButton(
                           onPressed: () => onOpenForm(context, transacao: tr),
-                          icon: Icon(
-                            Icons.edit,
-                            color: Colors.blue,
-                          ),
+                          icon: Icon(Icons.edit,color: Colors.blue,),
                         ),
-                        IconButton(
-                            onPressed: () {
-                            onRemove(tr.id); 
-                          },
-                            icon: Icon(
-                              Icons.delete,
-                              color: Colors.red.shade600,
-                            )),
+                        IconButton( onPressed: () { onRemove(tr.id); },
+                            icon: Icon(Icons.delete, color: Colors.red.shade600,)),
                       ],
                     ),
                   ),
