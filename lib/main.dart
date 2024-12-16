@@ -37,11 +37,11 @@ class AppDespesas extends StatelessWidget {
       home: MyHomePage(),
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: Color.fromARGB(255, 237, 237, 237),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 225, 225, 225),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 144, 255, 23),
-          primary: const Color.fromARGB(255, 0, 193, 108),
-          secondary: const Color.fromARGB(255, 144, 255, 23),
+          seedColor: const Color.fromARGB(255, 10, 69, 46),
+          primary: const Color.fromARGB(255, 24, 172, 115),
+          secondary: const Color.fromARGB(255, 10, 69, 46),
           brightness: Brightness.light,
         ),
       ),
@@ -58,6 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Transacao> _Transacoes = [];
 
   double _totalValue = 0.0;
+  double _totalEntradas = 0.0;
+  double _totalSaidas = 0.0;
 
   List<Transacao> get _recentTransacoes {
     return _Transacoes.where((tr) {
@@ -67,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
+  @override
   void initState() {
     super.initState();
     _carregarTransacoes();
@@ -78,11 +81,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
       List<Transacao> transacoesList = transacoes.map((tr) {
         return Transacao(
-          id: tr['id'], 
+          id: tr['id'],
           title: tr['titulo'],
-          value: tr['valor'],
-          data: DateTime.parse(
-              tr['data']), 
+          value: (tr['valor'] as num).toDouble(),
+          data: DateTime.parse(tr['data']),
           entrada: tr['entrada'],
         );
       }).toList();
@@ -91,14 +93,15 @@ class _MyHomePageState extends State<MyHomePage> {
         _Transacoes.clear();
         _Transacoes.addAll(transacoesList);
         _totalValue = _Transacoes.fold(0.0, (sum, tr) => sum + (tr.entrada ? tr.value : -tr.value));
+        _totalEntradas = _Transacoes.where((tr) => tr.entrada).fold(0.0, (sum, tr) => sum + tr.value);
+        _totalSaidas = _Transacoes.where((tr) => !tr.entrada).fold(0.0, (sum, tr) => sum + tr.value);
       });
     } catch (e) {
       print('Erro ao carregar transações: $e');
     }
   }
 
-  _AddTransacao(
-      String titulo, double valor, DateTime data, bool entrada) async {
+  _AddTransacao(String titulo, double valor, DateTime data, bool entrada) async {
     final newTransacao = Transacao(
       id: Random().nextDouble().toString(),
       title: titulo,
@@ -108,15 +111,21 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     try {
+      setState(() {
+        _Transacoes.add(newTransacao);
+        _totalValue += entrada ? valor : -valor;
+        if (entrada) {
+          _totalEntradas += valor;
+        } else {
+          _totalSaidas += valor;
+        }
+      });
       await Database().addTransacao(titulo, valor, data, entrada);
       await _carregarTransacoes();
     } catch (error) {
       print('erro: $error');
     }
-    setState(() {
-      _Transacoes.add(newTransacao);
-      _totalValue += entrada ? valor : -valor;
-    });
+
     Navigator.of(context).pop();
   }
 
@@ -126,18 +135,24 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       print("Erro ao deletar transação: $e");
     }
-      setState(() {
-        final transacaoIndex = _Transacoes.indexWhere((tr) => tr.id == id);
-        if (transacaoIndex >= 0) {
-          final deleteTransacao = _Transacoes[transacaoIndex];
+    setState(() {
+      final transacaoIndex = _Transacoes.indexWhere((tr) => tr.id == id);
+      if (transacaoIndex >= 0) {
+        final deleteTransacao = _Transacoes[transacaoIndex];
 
-          _totalValue -= deleteTransacao.entrada
-              ? deleteTransacao.value
-              : -deleteTransacao.value;
+        _totalValue -= deleteTransacao.entrada
+            ? deleteTransacao.value
+            : -deleteTransacao.value;
 
-          _Transacoes.removeAt(transacaoIndex);
+        if (deleteTransacao.entrada) {
+          _totalEntradas -= deleteTransacao.value;
+        } else {
+          _totalSaidas -= deleteTransacao.value;
         }
-      });
+
+        _Transacoes.removeAt(transacaoIndex);
+      }
+    });
   }
 
   _editTransacao(String id, String newTitle, double newValue, DateTime newDate,
@@ -150,20 +165,32 @@ class _MyHomePageState extends State<MyHomePage> {
       } catch (e) {
         print("erro:$e");
       }
-       setState(() {
-          final oldTransacao = _Transacoes[transacaoIndex];
+      setState(() {
+        final oldTransacao = _Transacoes[transacaoIndex];
 
-          _totalValue -= oldTransacao.entrada ? oldTransacao.value : -oldTransacao.value;
-          _totalValue += newEntrada ? newValue : -newValue; 
+        _totalValue -= oldTransacao.entrada ? oldTransacao.value : -oldTransacao.value;
+        _totalValue += newEntrada ? newValue : -newValue;
 
-          _Transacoes[transacaoIndex] = Transacao(
-            id: id,
-            title: newTitle,
-            value: newValue,
-            data: newDate,
-            entrada: newEntrada,
-          ); 
-        });
+        if (oldTransacao.entrada) {
+          _totalEntradas -= oldTransacao.value;
+        } else {
+          _totalSaidas -= oldTransacao.value;
+        }
+
+        if (newEntrada) {
+          _totalEntradas += newValue;
+        } else {
+          _totalSaidas += newValue;
+        }
+
+        _Transacoes[transacaoIndex] = Transacao(
+          id: id,
+          title: newTitle,
+          value: newValue,
+          data: newDate,
+          entrada: newEntrada,
+        );
+      });
     }
   }
 
@@ -189,72 +216,155 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.white,
           ),
         ),
-        centerTitle: true, 
+        centerTitle: true,
       ),
-  bottomNavigationBar: Container(
-     margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
-    child: NavigationBarTheme(
-    data: NavigationBarThemeData(
-      indicatorColor: Colors.transparent,
-      iconTheme: WidgetStateProperty.all(
-        IconThemeData(color: Colors.grey),
-      ),
-      labelTextStyle: WidgetStateProperty.all(
-        TextStyle(color: Colors.grey), 
-      ),
-    ),
-    child: NavigationBar(
-      selectedIndex: 0,
-      onDestinationSelected: (int index) {
-        if (index == 0) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => MyHomePage()),
-            (route) => false, 
-          );
-        } else if (index == 1) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Extrato()),
-          );
-        }
-      },
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.autorenew_rounded),
-          label: 'Transações',
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            indicatorColor: Colors.transparent,
+            iconTheme: WidgetStateProperty.all(
+              IconThemeData(color: Colors.grey),
+            ),
+            labelTextStyle: WidgetStateProperty.all(
+              TextStyle(color: Colors.grey),
+            ),
+          ),
+          child: NavigationBar(
+            selectedIndex: 0,
+            onDestinationSelected: (int index) {
+              if (index == 0) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyHomePage()),
+                  (route) => false,
+                );
+              } else if (index == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Extrato()),
+                );
+              }
+            },
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.autorenew_rounded),
+                label: 'Transações',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.attach_money_outlined),
+                selectedIcon: Icon(Icons.attach_money, color: Colors.green,),
+                label: 'Extrato',
+              ),
+            ],
+          ),
         ),
-        NavigationDestination(
-          icon: Icon(Icons.attach_money_outlined),
-          selectedIcon: Icon(Icons.attach_money),
-          label: 'Extrato',
-        ),
-      ],
-    ),
-    ),
-  ),
+      ),
       body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Chart(_recentTransacoes),
-            Center(
-              child: Text(
-                'R\$${_totalValue.toStringAsFixed(2)}',
-                style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: _totalValue >= 0 ? Colors.green : Colors.red,
-                ),
+          children:[
+            Container(
+              width: double.infinity,
+              color: const Color.fromARGB(255, 24, 172, 115),
+              height: 150,
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Saldo Atual',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'R\$${_totalValue.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontSize: 35,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-            TransacaoLista(_Transacoes, _deleteTransacao, _editTransacao, _openTransacaoFormModal),
+            Container(
+              color: const Color.fromARGB(255, 24, 172, 115),
+              padding: EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.arrow_downward,
+                            color:  Color.fromARGB(255, 10, 69, 46),
+                            size: 18,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'Entradas',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: const Color.fromARGB(255, 255, 255, 255),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'R\$${_totalEntradas.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 10, 69, 46),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Row(
+                      children: [
+                          Icon( Icons.arrow_upward, color: Color.fromARGB(255, 186, 35, 35),size: 18,),
+                          SizedBox(width: 4),
+                          Text('Saídas',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: const Color.fromARGB(255, 255, 255, 255),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'R\$${_totalSaidas.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 186, 35, 35),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Chart(_recentTransacoes),
+            TransacaoLista(
+              _Transacoes,
+              _deleteTransacao,
+              _editTransacao,
+              _openTransacaoFormModal,
+            ),
           ],
         ),
       ),
-
       floatingActionButton: FloatingActionButton(
           child: Icon(
             Icons.add,
@@ -263,7 +373,7 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Theme.of(context).colorScheme.primary,
           shape: CircleBorder(),
           onPressed: () => _openTransacaoFormModal(context)),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

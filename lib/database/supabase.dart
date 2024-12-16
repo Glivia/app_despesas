@@ -1,4 +1,4 @@
-import 'package:app_despesas/transacao.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Database {

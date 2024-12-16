@@ -29,7 +29,7 @@ class _Extrato extends State<Extrato> {
         return Transacao(
           id: tr['id'],
           title: tr['titulo'],
-          value: tr['valor'],
+          value: (tr['valor'] as num).toDouble(),
           data: DateTime.parse(tr['data']),
           entrada: tr['entrada'],
         );
@@ -85,78 +85,10 @@ class _Extrato extends State<Extrato> {
             fontWeight: FontWeight.bold, 
           ),
         ),
-      centerTitle: true, 
+        centerTitle: true, 
       ),
       body: Column(
         children: [
-          Container(
-            color: Colors.grey[200],
-            padding: EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_downward,
-                          color: Colors.green,
-                          size: 16,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          'Entradas',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      'R\$${_totalEntradas.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ],
-                ),
-                // Saídas com seta
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_upward,
-                          color: Colors.red,
-                          size: 16,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          'Saídas',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      'R\$${_totalSaidas.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
           Expanded(
             child: ListView.builder(
               itemCount: datasOrdenadas.length,
@@ -172,36 +104,43 @@ class _Extrato extends State<Extrato> {
                       child: Text(
                         data,
                         style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black,
                         ),
                       ),
                     ),
                     ...transacoes.map((tr) {
-                      Color transacaoColor = tr.entrada ? Colors.green : Colors.red;
-                      return Card(
-                        margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: transacaoColor,
-                            child: Icon(
-                            tr.entrada ? Icons.arrow_downward : Icons.arrow_upward,
-                             color: Colors.white,
+                      Color transacaoColor = tr.entrada ? Color.fromARGB(255, 10, 69, 46) : Color.fromARGB(255, 186, 35, 35);
+                      return Column(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                            color: Colors.transparent,
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: transacaoColor,
+                                child: Icon(
+                                  tr.entrada ? Icons.arrow_downward : Icons.arrow_upward,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              title: Text(
+                                tr.title,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              trailing: Text(
+                                'R\$${tr.value.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  color: transacaoColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15, 
+                                ),
+                              ),
                             ),
                           ),
-                          title: Text(
-                           tr.title,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          trailing: Text(
-                            'R\$${tr.value.toStringAsFixed(2)}',
-                            style: TextStyle(
-                            color: transacaoColor,
-                            fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                          Divider(color: Colors.grey[400], thickness: 1), 
+                        ],
                       );
                     }).toList(),
                   ],
@@ -211,49 +150,49 @@ class _Extrato extends State<Extrato> {
           ),
         ],
       ),
-       bottomNavigationBar: Container(
-     margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
-    child: NavigationBarTheme(
-    data: NavigationBarThemeData(
-      indicatorColor: Colors.transparent,
-      iconTheme: WidgetStateProperty.all(
-        IconThemeData(color: Colors.grey),
-      ),
-      labelTextStyle: WidgetStateProperty.all(
-        TextStyle(color: Colors.grey), 
-      ),
-    ),
-    child: NavigationBar(
-      selectedIndex: 0,
-      onDestinationSelected: (int index) {
-        if (index == 0) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => MyHomePage()),
-            (route) => false, 
-          );
-        } else if (index == 1) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Extrato()),
-          );
-        }
-      },
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.autorenew_rounded),
-          label: 'Transações',
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            indicatorColor: Colors.transparent,
+            iconTheme: WidgetStateProperty.all(
+              IconThemeData(color: Colors.grey),
+            ),
+            labelTextStyle: WidgetStateProperty.all(
+              TextStyle(color: Colors.grey),
+            ),
+          ),
+          child: NavigationBar(
+            selectedIndex: 0,
+            onDestinationSelected: (int index) {
+              if (index == 0) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyHomePage()),
+                  (route) => false,
+                );
+              } else if (index == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Extrato()),
+                );
+              }
+            },
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.autorenew_rounded),
+                label: 'Transações',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.attach_money_outlined),
+                selectedIcon: Icon(Icons.attach_money),
+                label: 'Extrato',
+              ),
+            ],
+          ),
         ),
-        NavigationDestination(
-          icon: Icon(Icons.attach_money_outlined),
-          selectedIcon: Icon(Icons.attach_money),
-          label: 'Extrato',
-        ),
-      ],
-    ),
-    ),
-  ),
+      ),
     );
   }
 }

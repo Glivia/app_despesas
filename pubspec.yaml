@@ -1,6 +1,6 @@
 name: app_despesas
 description: "A new Flutter project."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -15,9 +15,7 @@ dependencies:
   intl: ^0.19.0
   syncfusion_flutter_charts: ^27.1.58
 
-  # Supabase dependency (adicionando o Supabase Flutter)
-  supabase_flutter: ^2.6.0 # Atualize conforme a versão mais recente disponível no pub.dev
-
+  supabase_flutter: ^2.6.0 
 dev_dependencies:
   flutter_test:
     sdk: flutter
