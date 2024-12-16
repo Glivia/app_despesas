@@ -93,16 +93,10 @@ class _TransacaoFormState extends State<TransacaoForm> {
                 height: 70,
                 child: Row(
                   children: [
-                    Row(
-                      children: [
-                        Text('Entrada?'),
+                    Row( children: [ Text('Entrada?'),
                         Checkbox(
                           value: _entrada,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              _entrada = value ?? false;
-                            });
-                          },
+                          onChanged: (bool? value) { setState(() { _entrada = value ?? false;});},
                         ),
                       ],
                     ),
