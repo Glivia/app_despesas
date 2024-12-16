@@ -99,71 +99,39 @@ class _Extrato extends State<Extrato> {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.arrow_downward,
-                          color: Colors.green,
-                          size: 16,
-                        ),
+                        Icon( Icons.arrow_downward, color: Colors.green, size: 16,),
                         SizedBox(width: 4),
                         Text(
                           'Entradas',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
+                          style: TextStyle( fontSize: 16,color: Colors.black,),
+                        ),],),
                     Text(
                       'R\$${_totalEntradas.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
+                      style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors.green,),
                     ),
-                  ],
-                ),
-                // Saídas com seta
+                  ],),
                 Column(
-                  children: [
-                    Row(
+                  children: [ Row(
                       children: [
-                        Icon(
-                          Icons.arrow_upward,
-                          color: Colors.red,
-                          size: 16,
-                        ),
+                        Icon(Icons.arrow_upward, color: Colors.red,size: 16,),
                         SizedBox(width: 4),
                         Text(
                           'Saídas',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
+                          style: TextStyle(fontSize: 16,color: Colors.black,),
                         ),
-                      ],
-                    ),
+                      ],),
                     Text(
                       'R\$${_totalSaidas.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.red),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+                  ], ), ],),),
           Expanded(
             child: ListView.builder(
               itemCount: datasOrdenadas.length,
               itemBuilder: (ctx, index) {
                 final data = datasOrdenadas[index];
                 final transacoes = transacoesAgrupadas[data]!;
-
+                
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -205,12 +173,9 @@ class _Extrato extends State<Extrato> {
                       );
                     }).toList(),
                   ],
-                );
-              },
+                );},
             ),
-          ),
-        ],
-      ),
+          ),],),
        bottomNavigationBar: Container(
      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
     child: NavigationBarTheme(
