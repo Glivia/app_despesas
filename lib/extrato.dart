@@ -162,12 +162,12 @@ class _Extrato extends State<Extrato> {
           child: NavigationBar(
             selectedIndex: 0,
             onDestinationSelected: (int index) {
-              if (index == 0) {
+              if (index == 0) {//index da página principal
                 Navigator.pushAndRemoveUntil( context,
                 MaterialPageRoute(builder: (context) => MyHomePage()),
-                  (route) => false,
+                  (route) => false,//retira o retorno automático
                 );
-              } else if (index == 1) {
+              } else if (index == 1) {//index página do extrato
                 Navigator.push( context,
                 MaterialPageRoute(builder: (context) => Extrato()),
                 );}
