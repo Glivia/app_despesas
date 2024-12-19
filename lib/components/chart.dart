@@ -8,39 +8,39 @@ class Chart extends StatelessWidget {
 
   Chart(this.recentTransacao);
 
-  List<Map<String, dynamic>> get groupedTransacoes {
-    return List.generate(7, (index) {
-      final weekDay = DateTime.now().subtract(
-        Duration(days: index),
+  List<Map<String, dynamic>> get agrupaTransacoes {
+    return List.generate(7, (index) {//gera lista com 7 elementos, cada dia da semana
+      final weekDay = DateTime.now().subtract(//calcula a data de cada dia voltando 7 dias a partir da data atual
+        Duration(days: index),//subtração do index em dias
       );
 
-      double totalSum = 0.0;
+      double totalSum = 0.0;//soma total inicia zerado
 
       for (var i = 0; i < recentTransacao.length; i++) {
-        bool sameDay = recentTransacao[i].data.day == weekDay.day;
-        bool sameMonth = recentTransacao[i].data.month == weekDay.month;
-        bool sameYear = recentTransacao[i].data.year == weekDay.year;
+        bool Dia = recentTransacao[i].data.day == weekDay.day;//verifica se a transação ocorreu no mesmo dia
+        bool Mes = recentTransacao[i].data.month == weekDay.month;//mesmo mês
+        bool Ano = recentTransacao[i].data.year == weekDay.year;//mesmo ano
 
-        if (sameDay && sameMonth && sameYear) {
-          totalSum += recentTransacao[i].entrada ? recentTransacao[i].value : -recentTransacao[i].value;
-        }
+        if (Dia && Mes && Ano) {//se for mesmo dia, mes e ano
+          totalSum += recentTransacao[i].entrada ? recentTransacao[i].value : -recentTransacao[i].value;//soma o valor ao valor total
+        }//se for entrada ele soma, se for saida subtrai
       }
 
       return {
-        'day': DateFormat.E('pt_BR').format(weekDay).substring(0, 3), 
+        'day': DateFormat.E('pt_BR').format(weekDay).substring(0, 3),//abrevia os dias da semana
         'value': totalSum
       };
-    }).reversed.toList();
+    }).reversed.toList();//inverte a lista para o dia mais antigo seja o primeiro da lista e atual seja o ultimo
   }
 
-  double get _weekTotalValue {
-    return groupedTransacoes.fold(0.0, (sum, tr) {
-      return sum + tr['value'];
+  double get _TotalValueSemanal {
+    return agrupaTransacoes.fold(0.0, (sum, tr) {//acumula os valores
+      return sum + tr['value'];//soma o valor de cada transação ao total acumulado
     });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {//card dos charts
     return Card(
       elevation: 6,
       margin: EdgeInsets.all(10),
@@ -48,13 +48,13 @@ class Chart extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: groupedTransacoes.map((tr) {
+          children: agrupaTransacoes.map((tr) {
             return Flexible(
-              fit: FlexFit.tight,
+              fit: FlexFit.tight,//cada barra ocupa o maior espaço possível igualmente
               child: ChartBar(
-                label: tr['day'],
-                value: tr['value'],
-                percentage: _weekTotalValue == 0 ? 0 : (tr['value'] / _weekTotalValue),
+                label: tr['day'],//dia da semana
+                value: tr['value'],//valor do dia
+                percentage: _TotalValueSemanal == 0 ? 0 : (tr['value'] / _TotalValueSemanal),//calcula a porcentagem do valor total da semana
               ),
             ); 
           }).toList(),

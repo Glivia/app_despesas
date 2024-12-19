@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class ChartBar extends StatelessWidget {
+class ChartBar extends StatelessWidget { //class do chat bar
   final String label;
   final double value;
   final double percentage;
 
-  ChartBar({
-    required this.label,
-    required this.value,
-    required this.percentage,
+  ChartBar({//passando parametros como obrigatorios
+    required this.label,//titulo
+    required this.value,//valor
+    required this.percentage,//porcentagem
    
   });
 
@@ -16,11 +16,11 @@ class ChartBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        Container(//container do chart
           height: 20,
           child: FittedBox(child: Text('${value.toStringAsFixed(2)}'))),
         SizedBox(height: 5),
-        Container(
+        Container(//conteiner das barras
           height: 60,
           width: 10,
           child: Stack(
@@ -36,7 +36,7 @@ class ChartBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
-              FractionallySizedBox(
+              FractionallySizedBox(//barra de carregamento do chart
                  heightFactor: percentage.clamp(0.0, 1.0),
                 child: Container(
                   decoration: BoxDecoration(

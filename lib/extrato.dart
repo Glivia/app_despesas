@@ -10,20 +10,20 @@ class Extrato extends StatefulWidget {
 }
 
 class _Extrato extends State<Extrato> {
-  final List<Transacao> _transacoes = [];
+  final List<Transacao> _transacoes = [];//lista para armazenar as transações cadastradas
 
-  double _totalEntradas = 0.0;
-  double _totalSaidas = 0.0;
+  double _totalEntradas = 0.0;//inicia valor zerado
+  double _totalSaidas = 0.0;//inicia valor zerado
 
   @override
   void initState() {
     super.initState();
-    _carregarTransacoes();
+    _carregarTransacoes();//carrega as transações na página
   }
 
   _carregarTransacoes() async {
     try {
-      final transacoes = await Database().getTransacoes();
+      final transacoes = await Database().getTransacoes();//busca as transações no banco pelo get
 
       List<Transacao> transacoesList = transacoes.map((tr) {
         return Transacao(
@@ -33,49 +33,49 @@ class _Extrato extends State<Extrato> {
           data: DateTime.parse(tr['data']),
           entrada: tr['entrada'],
         );
-      }).toList();
+      }).toList();//converte em lista
 
-      double entradas = 0.0;
-      double saidas = 0.0;
-      for (var tr in transacoesList) {
+      double entradas = 0.0;//inicia entradas
+      double saidas = 0.0;//inicia saidas
+      for (var tr in transacoesList) {//Itera as transações da lista para calcular o valor de entrada e saida
         if (tr.entrada) {
-          entradas += tr.value;
+          entradas += tr.value;//se for entrada soma aqui
         } else {
-          saidas += tr.value;
+          saidas += tr.value;//se for saida soma aqui
         }
       }
 
-      setState(() {
-        _transacoes.clear();
-        _transacoes.addAll(transacoesList);
-        _totalEntradas = entradas;
-        _totalSaidas = saidas;
+      setState(() {//atualiza os dados da interface
+        _transacoes.clear();//limpa a interface
+        _transacoes.addAll(transacoesList);//adiciona todas novamente
+        _totalEntradas = entradas;//atualiza valor das entradas
+        _totalSaidas = saidas;//atualiza valor das saidas
       });
-    } catch (e) {
-      print('Erro ao carregar transações: $e');
+    } catch (erro) {
+      print('Erro ao carregar transações: $erro');//print erro
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final transacoesAgrupadas = <String, List<Transacao>>{};
+  Widget build(BuildContext context) {//construindo a interface
+    final transacoesAgrupadas = <String, List<Transacao>>{};//cria uma lista agrupando por datas
     for (var tr in _transacoes) {
-      final dateKey = DateFormat('dd/MM/yyyy').format(tr.data);
-      if (!transacoesAgrupadas.containsKey(dateKey)) {
-        transacoesAgrupadas[dateKey] = [];
+      final dateKey = DateFormat('dd/MM/yyyy').format(tr.data);//formata a data como chave para agrupar
+      if (!transacoesAgrupadas.containsKey(dateKey)) {//verifica se a chave esta na lista
+        transacoesAgrupadas[dateKey] = [];//cria uma nova
       }
-      transacoesAgrupadas[dateKey]!.add(tr);
+      transacoesAgrupadas[dateKey]!.add(tr);//senão adiciona em uma existente
     }
 
-    final datasOrdenadas = transacoesAgrupadas.keys.toList()..sort((a, b) {
-      final dateA = DateFormat('dd/MM/yyyy').parse(a);
+    final datasOrdenadas = transacoesAgrupadas.keys.toList()..sort((a, b) {//ordena por ordem decrecente
+      final dateA = DateFormat('dd/MM/yyyy').parse(a);//converte para data
       final dateB = DateFormat('dd/MM/yyyy').parse(b);
-      return dateB.compareTo(dateA); 
+      return dateB.compareTo(dateA); //compara as datas para gerar a ordem
     });
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
+      appBar: AppBar(//iniciando appbar
+        automaticallyImplyLeading: false,//retira o botão de retorno automático
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(
           'Extrato',
@@ -93,8 +93,8 @@ class _Extrato extends State<Extrato> {
             child: ListView.builder(
               itemCount: datasOrdenadas.length,
               itemBuilder: (ctx, index) {
-                final data = datasOrdenadas[index];
-                final transacoes = transacoesAgrupadas[data]!;
+          final data = datasOrdenadas[index];
+          final transacoes = transacoesAgrupadas[data]!;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +112,7 @@ class _Extrato extends State<Extrato> {
                     ),
                     ...transacoes.map((tr) {
                       Color transacaoColor = tr.entrada ? Color.fromARGB(255, 10, 69, 46) : Color.fromARGB(255, 186, 35, 35);
-                      return Column(
+                   return Column(
                         children: [
                           Container(
                             margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
@@ -120,17 +120,14 @@ class _Extrato extends State<Extrato> {
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: transacaoColor,
-                                child: Icon(
-                                  tr.entrada ? Icons.arrow_downward : Icons.arrow_upward,
+                                child: Icon( tr.entrada ? Icons.arrow_downward : Icons.arrow_upward,
                                   color: Colors.white,
                                 ),
                               ),
-                              title: Text(
-                                tr.title,
+                              title: Text( tr.title,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              trailing: Text(
-                                'R\$${tr.value.toStringAsFixed(2)}',
+                              trailing: Text( 'R\$${tr.value.toStringAsFixed(2)}',
                                 style: TextStyle(
                                   color: transacaoColor,
                                   fontWeight: FontWeight.bold,
@@ -166,17 +163,14 @@ class _Extrato extends State<Extrato> {
             selectedIndex: 0,
             onDestinationSelected: (int index) {
               if (index == 0) {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()),
+                Navigator.pushAndRemoveUntil( context,
+                MaterialPageRoute(builder: (context) => MyHomePage()),
                   (route) => false,
                 );
               } else if (index == 1) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Extrato()),
-                );
-              }
+                Navigator.push( context,
+                MaterialPageRoute(builder: (context) => Extrato()),
+                );}
             },
             destinations: const [
               NavigationDestination(
